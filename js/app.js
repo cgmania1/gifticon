@@ -31,12 +31,19 @@
     el.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
   }
   function main() { return document.getElementById('main'); }
+  // 움직임을 줄이도록 설정한 기기에서는 등장·숫자 올리기를 모두 건너뜁니다.
+  function reducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+  var lastAnimatedRoute = null;
   function animateView() {
     // [디자인 개선] 카드형 서비스의 시선 흐름만 살리기 위해 최초 등장 시 짧은 stagger만 사용합니다.
-    // [동적 효과] 페이지가 전환될 때 화면 전체가 한 번에 튀지 않고,
-    // 카드/타일이 짧게 순차 등장하도록 애니메이션 클래스를 붙입니다.
+    // 같은 화면을 다시 그릴 때(「사용함」 체크·예약 바꾸기 뒤)는 움직이지 않습니다 — 누를 때마다 화면 전체가 다시 떠오르면 어지럽습니다.
     var m = main();
     if (!m) return;
+    var r = route();
+    if (r === lastAnimatedRoute || reducedMotion()) { lastAnimatedRoute = r; return; }
+    lastAnimatedRoute = r;
     requestAnimationFrame(function () {
       Array.prototype.forEach.call(m.children, function (el, i) {
         el.classList.add('page-enter');
@@ -52,14 +59,13 @@
   }
 
   function animateCounters(scope) {
-    // [동적 효과] 상태 숫자는 0→현재 값으로 짧게 카운트업해
-    // 첫 화면이 정적인 관리표보다 살아 있는 대시보드처럼 느껴지게 합니다.
+    // [동적 효과] 상태 숫자는 0→현재 값으로 짧게 카운트업합니다(글자 폭이 같은 숫자꼴이라 자리가 흔들리지 않음).
     var nums = (scope || document).querySelectorAll('.tile-num[data-count]');
     Array.prototype.forEach.call(nums, function (el) {
       if (el.dataset.animated === '1') return;
       var target = parseInt(el.textContent, 10);
-      if (!isFinite(target) || target <= 0) { el.dataset.animated = '1'; return; }
       el.dataset.animated = '1';
+      if (!isFinite(target) || target <= 0) return;
       var start = performance.now();
       var duration = Math.min(620, 260 + target * 24);
       function tick(now) {
@@ -72,6 +78,118 @@
       requestAnimationFrame(tick);
     });
   }
+
+  // ── 첫 화면 그림 (선물 상자에서 펼쳐지는 쿠폰 · 가장 가까운 유효기간 달력 · 가족 쿠폰 지갑 휴대폰) ──
+  // 그림 속 숫자는 실제 보관함에서 가져옵니다: 달력 = 가장 먼저 끝나는 기프티콘의 날짜, 휴대폰 = 먼저 쓸 세 장의 D-day.
+  function artInfo(list) {
+    var usable = list.filter(function (g) { return !g.used && L.daysLeft(g.expiresOn, today) >= 0; })
+      .sort(function (a, b) { return a.expiresOn < b.expiresOn ? -1 : a.expiresOn > b.expiresOn ? 1 : 0; });
+    var first = usable[0];
+    var ymd = (first ? first.expiresOn : today).split('-').map(Number);
+    var rows = usable.slice(0, 3).map(function (g) { return { text: L.ddayText(g, today), st: L.statusOf(g, today) }; });
+    while (rows.length < 3) rows.push({ text: '사용', st: 'used' });
+    return {
+      month: ymd[1] + '월', day: String(ymd[2]),
+      caption: first ? '가장 먼저 끝나는 날' : '오늘',
+      badge: first ? L.ddayText(first, today) : '여유',
+      badgeSt: first ? L.statusOf(first, today) : 'ok',
+      rows: rows
+    };
+  }
+  function heroArt(info) {
+    var wrap = h('div', { class: 'hero-art' });
+    var barcode = function (x, y, w, hgt) {
+      // 가짜 바코드: 굵기가 다른 세로 막대 (실제 번호 아님)
+      var widths = [2, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1];
+      var out = '', cx = x;
+      for (var i = 0; i < widths.length && cx + widths[i] <= x + w; i++) {
+        if (i % 2 === 0) out += '<rect x="' + cx + '" y="' + y + '" width="' + widths[i] + '" height="' + hgt + '"/>';
+        cx += widths[i] + 1;
+      }
+      return '<g class="a-ink">' + out + '</g>';
+    };
+    var coupon = function (cls, rot, delay, label) {
+      // 상자 입구(150,214)를 축으로 펼쳐지는 교환권
+      return '<g class="fan-card ' + cls + '" style="--r:' + rot + 'deg;--d:' + delay + 'ms">' +
+        '<rect x="102" y="120" width="96" height="52" rx="9"/>' +
+        '<circle class="a-hole" cx="102" cy="146" r="6"/><circle class="a-hole" cx="198" cy="146" r="6"/>' +
+        '<text class="a-cap" x="114" y="138">' + label + '</text>' +
+        barcode(114, 144, 70, 18) + '</g>';
+    };
+    var row = function (i, r) {
+      var y = 100 + i * 52;
+      var chipW = r.text.length > 3 ? 40 : 34;
+      return '<g class="ph-row ph-' + r.st + '">' +
+        '<rect class="a-row" x="256" y="' + y + '" width="110" height="42" rx="10"/>' +
+        '<rect class="a-strip" x="256" y="' + y + '" width="6" height="42" rx="3"/>' +
+        '<rect class="a-line" x="270" y="' + (y + 10) + '" width="40" height="6" rx="3"/>' +
+        barcode(270, y + 22, 44, 10) +
+        '<rect class="a-chip" x="' + (360 - chipW) + '" y="' + (y + 12) + '" width="' + chipW + '" height="18" rx="9"/>' +
+        '<text class="a-chiptext" x="' + (360 - chipW / 2) + '" y="' + (y + 25) + '" text-anchor="middle">' + r.text + '</text></g>';
+    };
+    wrap.innerHTML =
+      '<svg class="art" viewBox="0 0 420 340" aria-hidden="true" focusable="false">' +
+      '<circle class="a-glow" cx="236" cy="184" r="150"/>' +
+      '<path class="a-path" d="M134 70 C 178 52, 216 56, 244 70"/>' +
+      '<path class="a-path" d="M222 252 C 232 262, 238 270, 244 276"/>' +
+      // 휴대폰 — 가족 쿠폰 지갑
+      '<g class="phone">' +
+      '<rect class="a-frame" x="236" y="26" width="150" height="296" rx="26"/>' +
+      '<rect class="a-screen" x="245" y="40" width="132" height="268" rx="18"/>' +
+      '<rect class="a-notch" x="291" y="48" width="40" height="6" rx="3"/>' +
+      '<text class="a-title" x="257" y="82">우리 가족</text>' +
+      '<circle class="a-av1" cx="330" cy="77" r="7"/><circle class="a-av2" cx="341" cy="77" r="7"/><circle class="a-av3" cx="352" cy="77" r="7"/><circle class="a-av4" cx="363" cy="77" r="7"/>' +
+      info.rows.map(function (r, i) { return row(i, r); }).join('') +
+      '<rect class="a-send" x="256" y="262" width="110" height="30" rx="15"/>' +
+      '<text class="a-sendtext" x="311" y="281" text-anchor="middle">가족에게 보내기</text>' +
+      '</g>' +
+      // 펼쳐지는 교환권 (상자 뒤) + 선물 상자
+      '<g class="fan">' +
+      coupon('fc1', -44, 120, '치킨') + coupon('fc2', -14, 220, '커피') + coupon('fc3', 18, 320, '상품권') +
+      '</g>' +
+      '<g class="box">' +
+      '<rect class="a-body" x="77" y="230" width="146" height="92" rx="12"/>' +
+      '<rect class="a-shade" x="77" y="230" width="146" height="12"/>' +
+      '<rect class="a-lid" x="67" y="206" width="166" height="30" rx="9"/>' +
+      '<rect class="a-ribbon" x="141" y="206" width="18" height="116"/>' +
+      '<path class="a-bow" d="M150 206c-12-3-26-12-24-23 1-8 11-11 18-6 6 4 6 14 6 29Z"/>' +
+      '<path class="a-bow" d="M150 206c12-3 26-12 24-23-1-8-11-11-18-6-6 4-6 14-6 29Z"/>' +
+      '<path class="a-heart" d="M150 294c-9-6-15-10-15-16 0-5 5-8 10-5 2 1 4 3 5 5 1-2 3-4 5-5 5-3 10 0 10 5 0 6-6 10-15 16Z"/>' +
+      '</g>' +
+      // 유효기간 달력 + D-day 배지
+      '<g class="cal">' +
+      '<rect class="a-calbody" x="16" y="28" width="112" height="104" rx="16"/>' +
+      '<path class="a-calhead" d="M16 44a16 16 0 0 1 16-16h80a16 16 0 0 1 16 16v14H16Z"/>' +
+      '<rect class="a-ring" x="40" y="20" width="8" height="18" rx="4"/><rect class="a-ring" x="96" y="20" width="8" height="18" rx="4"/>' +
+      '<text class="a-month" x="72" y="50" text-anchor="middle">' + info.month + '</text>' +
+      '<text class="a-day" x="72" y="102" text-anchor="middle">' + info.day + '</text>' +
+      '<text class="a-calcap" x="72" y="121" text-anchor="middle">' + info.caption + '</text>' +
+      '</g>' +
+      '<g class="badge badge-' + info.badgeSt + '">' +
+      '<circle class="a-pulse" cx="128" cy="30" r="25"/>' +
+      '<circle class="a-badge" cx="128" cy="30" r="25"/>' +
+      '<text class="a-badgetext" x="128" y="35" text-anchor="middle">' + info.badge + '</text>' +
+      '</g>' +
+      '<path class="a-spark s1" d="M212 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/>' +
+      '<path class="a-spark s2" d="M26 196l2 6 6 2-6 2-2 6-2-6-6-2 6-2Z"/>' +
+      '<path class="a-spark s3" d="M404 150l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>' +
+      '</svg>';
+    watchArt(wrap);
+    return wrap;
+  }
+  // 그림이 화면 밖에 있거나 탭이 가려지면 반복 움직임을 멈춥니다.
+  var artObserver = window.IntersectionObserver ? new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { e.target.classList.toggle('is-off', !e.isIntersecting); });
+  }) : null;
+  function watchArt(el) {
+    if (!artObserver) return;
+    if (watchArt.el) artObserver.unobserve(watchArt.el);
+    artObserver.observe(el);
+    watchArt.el = el;
+  }
+  document.addEventListener('visibilitychange', function () {
+    document.documentElement.classList.toggle('anim-paused', document.hidden);
+  });
 
   function show() {
     var m = main();
@@ -208,17 +326,19 @@
     var cards = h('div', { class: 'cards' }, list.map(card));
     // [디자인 개선] 메인 화면을 '목록'이 아니라 '오늘 무엇을 해야 하는지'를 알려 주는 대시보드로 재구성합니다.
     var dashboardHero = h('section', { class: 'dashboard-hero', 'aria-labelledby': 'heroTitle' },
-      h('div', null,
+      h('div', { class: 'hero-text' },
         h('p', { class: 'hero-kicker' }, 'FAMILY GIFT · 우리 가족 선물함'),
         h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족 기프티콘,\n이번에는 놓치지 않게'),
-        h('p', { class: 'hero-copy' }, '가족이 같이 쓰는 기프티콘은 가까운 사람이 먼저 알아차리고,\n쓸 사람을 정해 두면 필요한 순간에 바로 꺼내 쓸 수 있어요.'),
+        h('p', { class: 'hero-copy' }, '가족이 같이 쓰는 기프티콘은 가까운 사람이 먼저 알아차리고, 쓸 사람을 정해 두면 필요한 순간에 바로 꺼내 쓸 수 있어요.'),
         h('div', { class: 'hero-actions' },
           h('a', { class: 'btn primary', href: '#/add' }, '＋ 기프티콘 등록'),
-          h('button', { type: 'button', class: 'btn', onclick: function () { settings.tab = 'soon'; saveSettings(); render(); } }, '곧 만료부터 보기'))),
-      h('div', { class: 'hero-side' },
-        h('p', { class: 'hero-side-label' }, '이번 주 먼저 쓸 선물'),
-        h('strong', null, String(s.soon) + '장'),
-        h('span', null, s.soon ? '7일 안에 만료되는 선물이에요. 오늘 한 번만 챙겨봐요.' : '지금은 급하게 확인할 기프티콘이 없어요.')));
+          h('button', { type: 'button', class: 'btn', onclick: function () { settings.tab = 'soon'; saveSettings(); render(); } }, '곧 만료부터 보기')),
+        h('div', { class: 'hero-side' + (s.soon ? ' has-soon' : '') },
+          h('strong', null, String(s.soon) + '장'),
+          h('span', null,
+            h('b', { class: 'hero-side-label' }, '이번 주 먼저 쓸 선물'),
+            s.soon ? '7일 안에 만료되는 선물이에요. 오늘 한 번만 챙겨봐요.' : '지금은 급하게 확인할 기프티콘이 없어요.'))),
+      heroArt(artInfo(items)));
     return [
       dashboardHero,
       h('div', { class: 'box-head' },
@@ -711,8 +831,10 @@
         h('button', { type: 'submit', class: 'btn primary' }, '로그인'),
         h('button', { type: 'button', class: 'btn', onclick: function () { run('up'); } }, '처음이면 가입')));
     form.addEventListener('submit', function (ev) { ev.preventDefault(); run('in'); });
-    return [h('h1', null, '가족 기프티콘 보관함'), h('p', { class: 'lead' }, '가족 각자 이메일로 가입·로그인합니다.'), form,
-      h('p', { class: 'hint' }, '주소·키를 바꾸려면 「설정」으로 가세요.')];
+    var art = heroArt({ month: (Number(today.split('-')[1])) + '월', day: String(Number(today.split('-')[2])), caption: '오늘', badge: 'D-7', badgeSt: 'soon',
+      rows: [{ text: 'D-7', st: 'soon' }, { text: 'D-21', st: 'ok' }, { text: '사용', st: 'used' }] });
+    return [h('h1', null, '가족 기프티콘 보관함'), h('p', { class: 'lead' }, '가족 각자 이메일로 가입·로그인합니다.'),
+      h('div', { class: 'login-layout' }, h('div', null, form, h('p', { class: 'hint' }, '주소·키를 바꾸려면 「설정」으로 가세요.')), art)];
   }
 
   function viewSetupFamily() {
