@@ -6,10 +6,15 @@
   <!-- [디자인 개선] 브라우저/공유 화면에 서비스의 이름과 대표 색상을 일관되게 노출합니다. -->
   <title>우리 가족 기프티콘 · Family Gift</title>
   <meta name="description" content="가족이 함께 기프티콘을 등록하고, 유효기간 D-day·사용 여부·예약자·금액형 잔액을 한눈에 관리하는 가족용 보관함입니다.">
-  <meta name="theme-color" content="#2F2A5A">
+  <meta name="theme-color" content="#463955">
   <meta name="application-name" content="Family Gift">
+  <!-- [배포 개선] 카카오톡·메신저·SNS에서 공유될 때 서비스의 정체성이 보이도록 기본 Open Graph 메타데이터를 추가합니다. -->
+  <meta property="og:title" content="우리 가족 기프티콘 · Family Gift">
+  <meta property="og:description" content="가족이 같이 쓰는 기프티콘을 한곳에 모으고, 유효기간을 놓치지 않도록 관리하는 따뜻한 가족용 보관함입니다.">
+  <meta property="og:type" content="website">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/family-gift-logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -25,11 +30,11 @@
         </span>
       </a>
       <nav class="nav" id="nav" aria-label="주 메뉴">
-        <a href="#/" data-route="/"><span class="nav-icon" aria-hidden="true">⌂</span>보관함</a>
-        <a href="#/add" data-route="/add"><span class="nav-icon" aria-hidden="true">＋</span>등록</a>
-        <a href="#/log" data-route="/log"><span class="nav-icon" aria-hidden="true">◷</span>기록</a>
-        <a href="#/family" data-route="/family"><span class="nav-icon" aria-hidden="true">♥</span>가족</a>
-        <a href="#/settings" data-route="/settings"><span class="nav-icon" aria-hidden="true">⚙</span>설정</a>
+        <a href="#/" data-route="/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 10.4 12 3.7l8.5 6.7v9.2a.9.9 0 0 1-.9.9h-5v-6.2h-5.2v6.2h-5a.9.9 0 0 1-.9-.9z"/></svg></span>보관함</a>
+        <a href="#/add" data-route="/add"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>등록</a>
+        <a href="#/log" data-route="/log"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4.5h12M6 9.5h12M6 14.5h8M6 19.5h6"/></svg></span>기록</a>
+        <a href="#/family" data-route="/family"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.2 11.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4ZM16.2 10.1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.8 19.2c.5-3.1 2.2-4.7 4.4-4.7s3.9 1.6 4.4 4.7M13.4 18.3c.4-2.3 1.6-3.5 3.1-3.5 1.6 0 2.7 1.2 3.1 3.5"/></svg></span>가족</a>
+        <a href="#/settings" data-route="/settings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Zm8.1 3.2-1.6-.4a6.8 6.8 0 0 0-.6-1.4l.9-1.4-1.8-1.8-1.4.9a6.8 6.8 0 0 0-1.4-.6l-.4-1.6h-2.6l-.4 1.6a6.8 6.8 0 0 0-1.4.6L8 5.8 6.2 7.6l.9 1.4a6.8 6.8 0 0 0-.6 1.4l-1.6.4v2.6l1.6.4c.2.5.4 1 .6 1.4L6.2 16l1.8 1.8 1.4-.9c.4.3.9.5 1.4.6l.4 1.6h2.6l.4-1.6c.5-.2 1-.4 1.4-.6l1.4.9 1.8-1.8-.9-1.4c.3-.4.5-.9.6-1.4l1.6-.4z"/></svg></span>설정</a>
       </nav>
     </div>
   </header>

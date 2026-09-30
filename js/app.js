@@ -32,6 +32,7 @@
   }
   function main() { return document.getElementById('main'); }
   function animateView() {
+    // [디자인 개선] 카드형 서비스의 시선 흐름만 살리기 위해 최초 등장 시 짧은 stagger만 사용합니다.
     // [동적 효과] 페이지가 전환될 때 화면 전체가 한 번에 튀지 않고,
     // 카드/타일이 짧게 순차 등장하도록 애니메이션 클래스를 붙입니다.
     var m = main();
@@ -208,16 +209,16 @@
     // [디자인 개선] 메인 화면을 '목록'이 아니라 '오늘 무엇을 해야 하는지'를 알려 주는 대시보드로 재구성합니다.
     var dashboardHero = h('section', { class: 'dashboard-hero', 'aria-labelledby': 'heroTitle' },
       h('div', null,
-        h('p', { class: 'hero-kicker' }, 'FAMILY GIFT'),
-        h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족 기프티콘,\n까먹지 않게'),
-        h('p', { class: 'hero-copy' }, '가족이 같이 쓰는 기프티콘은 가까운 사람이 먼저 알아차리고,\n필요한 순간에 바로 꺼내 쓸 수 있게 정리해 둬요.'),
+        h('p', { class: 'hero-kicker' }, 'FAMILY GIFT · 우리 가족 선물함'),
+        h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족 기프티콘,\n이번에는 놓치지 않게'),
+        h('p', { class: 'hero-copy' }, '가족이 같이 쓰는 기프티콘은 가까운 사람이 먼저 알아차리고,\n쓸 사람을 정해 두면 필요한 순간에 바로 꺼내 쓸 수 있어요.'),
         h('div', { class: 'hero-actions' },
           h('a', { class: 'btn primary', href: '#/add' }, '＋ 기프티콘 등록'),
           h('button', { type: 'button', class: 'btn', onclick: function () { settings.tab = 'soon'; saveSettings(); render(); } }, '곧 만료부터 보기'))),
       h('div', { class: 'hero-side' },
         h('p', { class: 'hero-side-label' }, '이번 주 먼저 쓸 선물'),
         h('strong', null, String(s.soon) + '장'),
-        h('span', null, s.soon ? '일주일 안에 만료돼요. 먼저 챙겨볼까요?' : '급하게 확인할 기프티콘이 없어요.')));
+        h('span', null, s.soon ? '7일 안에 만료되는 선물이에요. 오늘 한 번만 챙겨봐요.' : '지금은 급하게 확인할 기프티콘이 없어요.')));
     return [
       dashboardHero,
       h('div', { class: 'box-head' },

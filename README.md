@@ -1,4 +1,4 @@
-# data09-21 · 가족 기프티콘 관리
+# Family Gift · 가족 기프티콘 관리
 
 가족이 함께 기프티콘을 사진과 함께 등록하고, 유효기간 D-day·사용 여부·예약자·금액형 잔액을 한눈에 보며 「사용함」을 직접 체크하는 보관함
 
@@ -69,8 +69,8 @@
 
 ## 디자인 리뉴얼 (2026-09-30)
 
-기존 기능을 유지한 채 서비스형 UI/UX를 적용했습니다. `Family Gift` 로고, 브랜드 컬러, 대시보드 hero, 카드 UI, 반응형 내비게이션, 파비콘/매니페스트를 추가했고, 2차로 최신 카드형 UI와 자연계열 색감에 맞춰 **Warm Ivory · Terracotta · Deep Plum · Sage · Butter** 팔레트와 실제 행동 중심의 micro-interaction을 적용했습니다.
+기존 기능을 유지한 채 서비스형 UI/UX를 적용했습니다. `Family Gift` 로고, 브랜드 컬러, 대시보드 hero, 카드 UI, 반응형 내비게이션, SVG 아이콘, PWA 아이콘/매니페스트를 정리했고, **Warm Ivory · Terracotta · Deep Plum · Sage · Butter** 팔레트와 실제 행동 중심의 micro-interaction을 적용했습니다. 반복적인 배경 움직임·카드 회전·숫자 breathing 같은 장식형 애니메이션은 제거하고 페이지 전환·버튼·D-day·dialog/toast에만 짧게 반응하도록 정리했습니다.
 
-동적 효과: 페이지/카드 stagger entrance, 상태 숫자 count-up, 만료 D-day pulse, alert sheen, 버튼 hover sheen/press feedback, dialog/toast entrance. `prefers-reduced-motion`도 지원합니다.
+상세 문서는 `docs/디자인_리뉴얼_업무지시서.md`, `docs/디자인트렌드_레퍼런스_2026-09-30.md`, `docs/디자인리뉴얼_개발일지_2026-09-30.md`, `docs/사이트평가보고서_2026-09-30.md`, `docs/최종점검보고서_2026-09-30.md`를 참고하세요.
 
 상세 문서: [디자인 리뉴얼 업무지시서](docs/디자인_리뉴얼_업무지시서.md) · [디자인 트렌드 레퍼런스](docs/디자인트렌드_레퍼런스_2026-09-30.md) · [개발일지](docs/디자인리뉴얼_개발일지_2026-09-30.md) · [사이트 평가보고서](docs/사이트평가보고서_2026-09-30.md) · [최종 점검보고서](docs/최종점검보고서_2026-09-30.md)

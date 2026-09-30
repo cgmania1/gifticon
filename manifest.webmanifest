@@ -1,9 +1,16 @@
 {
+  "id": "./",
   "name": "우리 가족 기프티콘",
   "short_name": "Family Gift",
-  "start_url": "./",
+  "start_url": "./#/",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#FFF9F3",
-  "theme_color": "#2F2A5A",
-  "description": "가족이 함께 기프티콘을 등록하고 유효기간을 놓치지 않도록 관리하는 보관함"
+  "theme_color": "#463955",
+  "description": "가족이 함께 기프티콘을 등록하고 유효기간을 놓치지 않도록 관리하는 보관함",
+  "icons": [
+    { "src": "assets/family-gift-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/family-gift-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }
