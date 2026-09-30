@@ -61,6 +61,12 @@
   function route() { return (location.hash || '#/').slice(1) || '/'; }
   function go(r) { if (location.hash === '#' + r) render(); else location.hash = r; }
 
+  // [디자인 개선] 브라우저 탭 제목도 화면/메뉴와 맞춰 서비스처럼 느껴지도록 경로별로 갱신합니다.
+  function paintPageTitle(r) {
+    var titles = { '/': '보관함', '/add': '기프티콘 등록', '/log': '사용 기록', '/family': '우리 가족', '/settings': '설정' };
+    document.title = '우리 가족 기프티콘 · ' + (titles[r] || 'Family Gift');
+  }
+
   // ── 사진: 줄여서 JPEG 로 ───────────────────────────────────
   function shrinkImage(file, maxSide) {
     return new Promise(function (ok, bad) {
@@ -157,10 +163,24 @@
     var list = L.filterList(items, tab, today);
     var tabLabel = L.TABS.filter(function (t) { return t.id === tab; })[0].label;
     var cards = h('div', { class: 'cards' }, list.map(card));
+    // [디자인 개선] 메인 화면을 '목록'이 아니라 '오늘 무엇을 해야 하는지'를 알려 주는 대시보드로 재구성합니다.
+    var dashboardHero = h('section', { class: 'dashboard-hero', 'aria-labelledby': 'heroTitle' },
+      h('div', null,
+        h('p', { class: 'hero-kicker' }, 'FAMILY GIFT'),
+        h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족, 선물부터 챙겨요'),
+        h('p', { class: 'hero-copy' }, '누가 쓸지 정하고, 유효기간이 가까운 선물은 먼저 확인해요. 가족이 같이 쓰는 만큼 “나중에”를 줄여 줍니다.'),
+        h('div', { class: 'hero-actions' },
+          h('a', { class: 'btn primary', href: '#/add' }, '＋ 기프티콘 등록'),
+          h('button', { type: 'button', class: 'btn', onclick: function () { settings.tab = 'soon'; saveSettings(); render(); } }, '곧 만료부터 보기'))),
+      h('div', { class: 'hero-side' },
+        h('p', { class: 'hero-side-label' }, '이번 주 먼저 확인할 선물'),
+        h('strong', null, String(s.soon) + '장'),
+        h('span', null, s.soon ? '유효기간이 7일 안으로 들어왔어요.' : '급하게 확인할 기프티콘이 없어요.')));
     return [
+      dashboardHero,
       h('div', { class: 'box-head' },
-        h('h1', null, '기프티콘 보관함'),
-        h('a', { class: 'btn primary', href: '#/add' }, '+ 기프티콘 등록')),
+        h('h2', null, '보관함 현황'),
+        h('a', { class: 'btn small', href: '#/family' }, fam.family.name + ' · 가족 보기')),
       alertBox,
       tiles,
       h('div', { class: 'list-head' }, h('h2', { id: 'listTitle' }, tabLabel + ' ' + list.length + '장'), allBtn),
@@ -694,6 +714,7 @@
 
   function render() {
     var r = route();
+    paintPageTitle(r);
     paintChrome();
     if (r === '/settings') { show(viewSettings()); return; }
     if (store.needsLogin()) {

@@ -1,0 +1,9 @@
+{
+  "name": "우리 가족 기프티콘",
+  "short_name": "Family Gift",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FFF9F3",
+  "theme_color": "#2F2A5A",
+  "description": "가족이 함께 기프티콘을 등록하고 유효기간을 놓치지 않도록 관리하는 보관함"
+}
