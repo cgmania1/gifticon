@@ -31,10 +31,52 @@
     el.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
   }
   function main() { return document.getElementById('main'); }
+  function animateView() {
+    // [동적 효과] 페이지가 전환될 때 화면 전체가 한 번에 튀지 않고,
+    // 카드/타일이 짧게 순차 등장하도록 애니메이션 클래스를 붙입니다.
+    var m = main();
+    if (!m) return;
+    requestAnimationFrame(function () {
+      Array.prototype.forEach.call(m.children, function (el, i) {
+        el.classList.add('page-enter');
+        el.style.setProperty('--i', String(Math.min(i, 8)));
+      });
+      var items = m.querySelectorAll('.card, .tile, .alert-box, .panel, .log-item');
+      Array.prototype.forEach.call(items, function (el, i) {
+        el.classList.add('motion-item');
+        el.style.setProperty('--i', String(Math.min(i, 12)));
+      });
+      animateCounters(m);
+    });
+  }
+
+  function animateCounters(scope) {
+    // [동적 효과] 상태 숫자는 0→현재 값으로 짧게 카운트업해
+    // 첫 화면이 정적인 관리표보다 살아 있는 대시보드처럼 느껴지게 합니다.
+    var nums = (scope || document).querySelectorAll('.tile-num[data-count]');
+    Array.prototype.forEach.call(nums, function (el) {
+      if (el.dataset.animated === '1') return;
+      var target = parseInt(el.textContent, 10);
+      if (!isFinite(target) || target <= 0) { el.dataset.animated = '1'; return; }
+      el.dataset.animated = '1';
+      var start = performance.now();
+      var duration = Math.min(620, 260 + target * 24);
+      function tick(now) {
+        var p = Math.min(1, (now - start) / duration);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      el.textContent = '0';
+      requestAnimationFrame(tick);
+    });
+  }
+
   function show() {
     var m = main();
     m.innerHTML = '';
     for (var i = 0; i < arguments.length; i++) add(m, arguments[i]);
+    animateView();
   }
   function toast(msg, isError) {
     var t = document.getElementById('toast');
@@ -167,15 +209,15 @@
     var dashboardHero = h('section', { class: 'dashboard-hero', 'aria-labelledby': 'heroTitle' },
       h('div', null,
         h('p', { class: 'hero-kicker' }, 'FAMILY GIFT'),
-        h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족, 선물부터 챙겨요'),
-        h('p', { class: 'hero-copy' }, '누가 쓸지 정하고, 유효기간이 가까운 선물은 먼저 확인해요. 가족이 같이 쓰는 만큼 “나중에”를 줄여 줍니다.'),
+        h('h1', { class: 'hero-title', id: 'heroTitle' }, '우리 가족 선물,\n까먹지 않게'),
+        h('p', { class: 'hero-copy' }, '가족이 같이 쓰는 선물은 가까운 사람이 먼저 알아차리고,\n필요한 순간에 바로 꺼내 쓸 수 있게 정리해 둬요.'),
         h('div', { class: 'hero-actions' },
           h('a', { class: 'btn primary', href: '#/add' }, '＋ 기프티콘 등록'),
           h('button', { type: 'button', class: 'btn', onclick: function () { settings.tab = 'soon'; saveSettings(); render(); } }, '곧 만료부터 보기'))),
       h('div', { class: 'hero-side' },
-        h('p', { class: 'hero-side-label' }, '이번 주 먼저 확인할 선물'),
+        h('p', { class: 'hero-side-label' }, '이번 주 먼저 쓸 선물'),
         h('strong', null, String(s.soon) + '장'),
-        h('span', null, s.soon ? '유효기간이 7일 안으로 들어왔어요.' : '급하게 확인할 기프티콘이 없어요.')));
+        h('span', null, s.soon ? '일주일 안에 만료돼요. 먼저 챙겨볼까요?' : '급하게 확인할 기프티콘이 없어요.')));
     return [
       dashboardHero,
       h('div', { class: 'box-head' },
@@ -188,7 +230,7 @@
     ];
   }
 
-  function card(g) {
+  function card(g, index) {
     var st = L.statusOf(g, today);
     var usedBox = h('input', { type: 'checkbox', checked: g.used, 'aria-describedby': 'st-' + g.id });
     usedBox.addEventListener('change', function () {
@@ -212,7 +254,7 @@
     var inAlert = !g.used && L.alertsFor([g], settings.alertDays, today).length > 0;
     var sendBtn = inAlert ? h('button', { type: 'button', class: 'btn small send-one', onclick: function () { openSend([g]); } }, '가족에게 보내기') : null;
     var usedLine = g.used ? '사용: ' + nameOf(g.usedBy) + (g.usedAt ? ' · ' + L.fmtDateTime(g.usedAt) : '') : null;
-    return h('article', { class: 'card st-' + st, 'data-id': g.id },
+    return h('article', { class: 'card st-' + st, 'data-id': g.id, style: '--i:' + String(Math.min(index || 0, 12)) },
       h('div', { class: 'card-top' },
         thumb(g),
         h('div', { class: 'card-body' },

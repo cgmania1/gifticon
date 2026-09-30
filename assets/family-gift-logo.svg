@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">Family Gift</title>
   <desc id="desc">가족이 함께 쓰는 기프티콘을 상징하는 선물 상자 아이콘</desc>
-  <rect width="128" height="128" rx="32" fill="#2F2A5A"/>
-  <path d="M27 48.5h74v48.2a8 8 0 0 1-8 8H35a8 8 0 0 1-8-8V48.5Z" fill="#FF776B"/>
-  <path d="M24 40a7 7 0 0 1 7-7h66a7 7 0 0 1 7 7v11H24V40Z" fill="#F4C95D"/>
-  <path d="M64 33v71" stroke="#2F2A5A" stroke-width="7"/>
-  <path d="M24 49h80" stroke="#2F2A5A" stroke-width="7"/>
-  <path d="M63.5 33c-9.5-2-18.1-8.1-17.2-15.2.7-5.4 7-8.2 12-4.6 4.2 3 5 9.6 5.2 19.8Z" fill="#FFFFFF" stroke="#2F2A5A" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M64.5 33c9.5-2 18.1-8.1 17.2-15.2-.7-5.4-7-8.2-12-4.6-4.2 3-5 9.6-5.2 19.8Z" fill="#FFFFFF" stroke="#2F2A5A" stroke-width="5" stroke-linejoin="round"/>
+  <rect width="128" height="128" rx="32" fill="#433858"/>
+  <path d="M27 48.5h74v48.2a8 8 0 0 1-8 8H35a8 8 0 0 1-8-8V48.5Z" fill="#D96B50"/>
+  <path d="M24 40a7 7 0 0 1 7-7h66a7 7 0 0 1 7 7v11H24V40Z" fill="#F3C96F"/>
+  <path d="M64 33v71" stroke="#433858" stroke-width="7"/>
+  <path d="M24 49h80" stroke="#433858" stroke-width="7"/>
+  <path d="M63.5 33c-9.5-2-18.1-8.1-17.2-15.2.7-5.4 7-8.2 12-4.6 4.2 3 5 9.6 5.2 19.8Z" fill="#FFFFFF" stroke="#433858" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64.5 33c9.5-2 18.1-8.1 17.2-15.2-.7-5.4-7-8.2-12-4.6-4.2 3-5 9.6-5.2 19.8Z" fill="#FFFFFF" stroke="#433858" stroke-width="5" stroke-linejoin="round"/>
+<circle cx="64" cy="80" r="8" fill="#FFF8EF" opacity=".35"/>
+  <path d="M64 84c-6-4-11-6.9-11-11.3C53 69.5 56.2 67 60 69c2 .9 3.2 2.5 4 4 0.8-1.5 2-3.1 4-4 3.8-2 7 0.5 7 3.7C75 77.1 70 80 64 84Z" fill="#FFF8EF" opacity=".9"/>
 </svg>
